@@ -166,8 +166,8 @@ func TestRun_CommandFailureRollsBackWithFlag(t *testing.T) {
 		"--rollback-command", "touch " + rolled,
 		"--rollback-on-failure",
 	})
-	if code != 1 {
-		t.Fatalf("exit code = %d, want 1", code)
+	if code != 99 {
+		t.Fatalf("exit code = %d, want 99 (default rollback-on-failure exit code)", code)
 	}
 	if got, _ := os.ReadFile(target); string(got) != "original" {
 		t.Fatalf("file should be restored, content = %q", got)

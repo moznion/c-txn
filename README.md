@@ -61,6 +61,7 @@ kill -USR1 <pid-of-c-txn>
 | `--signal` | `USR1` | Confirmation signal to wait for. Accepts `USR1`, `USR2`, `HUP`, `INT`, `TERM`, `QUIT`, case-insensitive, with or without the `SIG` prefix. |
 | `--timeout-exit-code` | `100` | Exit code used when the timeout elapses without the confirmation signal. |
 | `--rollback-failure-exit-code` | `101` | Exit code used when the rollback itself fails (snapshot restore or rollback command errored). |
+| `--rollback-on-failure-exit-code` | `99` | Exit code used when `--command` fails and `--rollback-on-failure` rolls back successfully. |
 
 ### Behavior
 
@@ -80,9 +81,9 @@ kill -USR1 <pid-of-c-txn>
 | Code | Meaning |
 | --- | --- |
 | `0` | Committed — the confirmation signal was received in time. |
-| `1` | `--command` failed and `--rollback-on-failure` rolled back successfully. |
 | `2` | Usage error (e.g. missing/invalid `--timeout`, unknown `--signal`). |
 | _command's own code_ | `--command` failed and rollback was **not** requested (default). |
+| `--rollback-on-failure-exit-code` (default `99`) | `--command` failed and `--rollback-on-failure` rolled back successfully. |
 | `--timeout-exit-code` (default `100`) | Timed out without the signal; rolled back successfully. |
 | `--rollback-failure-exit-code` (default `101`) | Rollback itself failed; the system may be in an inconsistent state. |
 

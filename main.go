@@ -54,14 +54,15 @@ func run(args []string) int {
 	fs := flag.NewFlagSet("c-txn", flag.ContinueOnError)
 
 	var (
-		timeout           int
-		command           string
-		rollbackCommand   string
-		files             stringSlice
-		rollbackOnFailure bool
-		signalName        string
-		timeoutExitCode   int
-		rollbackFailCode  int
+		timeout                 int
+		command                 string
+		rollbackCommand         string
+		files                   stringSlice
+		rollbackOnFailure       bool
+		signalName              string
+		timeoutExitCode         int
+		rollbackFailCode        int
+		commandFailRollbackCode int
 	)
 	fs.IntVar(&timeout, "timeout", 0, "seconds to wait for the confirmation signal before rolling back (required, > 0)")
 	fs.StringVar(&command, "command", "", "command to run (optional)")
@@ -71,6 +72,7 @@ func run(args []string) int {
 	fs.StringVar(&signalName, "signal", "USR1", "confirmation signal to wait for, e.g. USR1, USR2, HUP, INT, TERM (with or without the SIG prefix)")
 	fs.IntVar(&timeoutExitCode, "timeout-exit-code", 100, "exit code to use when the timeout elapses without the confirmation signal")
 	fs.IntVar(&rollbackFailCode, "rollback-failure-exit-code", 101, "exit code to use when the rollback itself fails (snapshot restore or rollback command errored)")
+	fs.IntVar(&commandFailRollbackCode, "rollback-on-failure-exit-code", 99, "exit code to use when --command fails and --rollback-on-failure rolls back successfully")
 
 	if err := fs.Parse(args); err != nil {
 		return 2
@@ -127,7 +129,7 @@ func run(args []string) int {
 				if rollback(snaps, rollbackCommand) != nil {
 					return rollbackFailCode
 				}
-				return 1
+				return commandFailRollbackCode
 			}
 			fmt.Fprintf(os.Stderr, "c-txn: command failed (%v); exiting without rollback\n", err)
 			return exitCode(err)
